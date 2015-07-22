@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jun 26 12:23:06 2015
-
-@author: niels
+(C) 2015, Niels Anders, EUBrazilCC
 """
-
 import os, time, sys
 import multiprocessing as mp
 import subprocess

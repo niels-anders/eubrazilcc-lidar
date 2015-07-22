@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+(C) 2015, Niels Anders, EUBrazilCC
+"""
 from generic_tools import getpoints, gridcellborders, saveimg
 import numpy as np
 import sys, os.path, time

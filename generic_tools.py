@@ -2,7 +2,7 @@
 """
 Generic tools for lidar processing
 
-EUBrazilCC, Niels Anders
+(c) 2015 EUBrazilCC, Niels Anders
 """
 import time
 import numpy as np
