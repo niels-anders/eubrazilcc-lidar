@@ -2,7 +2,7 @@
 """
 (C) 2015, Niels Anders, EUBrazilCC
 """
-from generic_tools import saveimg, getpoints, gridcellborders
+from generic_tools import saveimg, getpoints, gridcellborders, ETA
 import numpy as np
 import sys, time, os.path
 
@@ -11,20 +11,22 @@ def createDSM(x,y,z,xi,yi,bx,by,res,geotransform, proj):
     Create DSM based on max point elevation
     """
     from generic_tools import idw
-    print 'Create DSM (%d x %d)...' % (len(xi), len(yi)),
+    print 'Create DSM (%d x %d)...' % (len(xi), len(yi))
     time.sleep(0.1)
     t0 = time.time()
     
     # initialize dsm array
     dsm = np.zeros((len(yi), len(xi))) * np.NaN
     
+    step = 0
     for i in np.arange(len(xi)):
         col = np.argwhere((x > bx[i]) & (x < bx[i+1]))
         for j in np.arange(len(yi)):
             row = (y[col] >= by[j]) & (y[col] < by[j+1])
             if sum(row) > 0:           
                 dsm[j,i] = z[col[row]].max()
-    
+        step = ETA(t0,time.time(),step,i,0,len(xi))                
+            
     # fill gaps using IDW interpolation ---------------------------
     XI, YI = np.meshgrid(xi,yi, indexing='xy')
     values = np.isnan(dsm)==0

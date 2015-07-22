@@ -8,6 +8,28 @@ import time
 import numpy as np
 from osgeo import gdal
 
+def ETA(t0,t1, step, i, r, k):
+    """
+    t0 = start time
+    t1 = current time
+    step = interval print to screen (fraction)
+    i = current row
+    r = correction of row number (required boundaries of dem are not taken into account)
+    k = total number of rows to process    
+    """
+    if i==0:
+        print '0 - - - - - - - - - - 100%'
+        print ' ',
+    pc = float(i+1- r)/k
+    
+    if pc == 1:
+        print ''
+    elif pc >= step:
+        print '#',
+        step = step+0.1
+
+    return step
+
 def gridcellborders(xi,yi,res):
     # grid cell borders
     bx = np.arange(xi.min() - res/float(2), xi.max() + res, res)

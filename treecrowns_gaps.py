@@ -2,7 +2,7 @@
 """
 (C) 2015, Niels Anders, EUBrazilCC
 """
-from generic_tools import getpoints, gridcellborders, saveimg
+from generic_tools import getpoints, gridcellborders, saveimg, ETA
 import numpy as np
 import sys, os.path, time
 import os
@@ -42,7 +42,7 @@ def ndlocalmaxima(data,s=2):
                 localmax[i][j] = 1
     return localmax
 
-def treecrowns(chm, seed, crowns, seeds, old_seeds, label, top, s_max, xi, yi):
+def treecrowns(chm, seed, crowns, seeds, old_seeds, label, top, s_max, xi, yi, threshold):
     if old_seeds[seed[0], seed[1]] == 0:
         # only continue if seed is not already processed
         crowns[seed[0], seed[1]] = label
@@ -56,7 +56,7 @@ def treecrowns(chm, seed, crowns, seeds, old_seeds, label, top, s_max, xi, yi):
                 global_j = seed[1] + j -1
                 temp = np.vstack([crown, np.array([global_i, global_j])]).astype('int')                  
                 std = np.std(chm[temp[:,0], temp[:,1]])        
-                if  std < 2:
+                if  std < threshold:
                     # accept merging
                     crown = np.vstack([crown, np.array([global_i, global_j])])  
                     crowns[global_i, global_j] = label 
@@ -90,11 +90,11 @@ if __name__=='__main__':
     extension = os.path.splitext(filename)[1]
 
     In  = filename
-    fn_tree     = '../example_data/output'+basename[basename.rfind('/'):]+'_treecrowns.tif' 
-    fn_gaps     = '../example_data/output'+basename[basename.rfind('/'):]+'_forestgaps.tif' 
-    fn_heights  = '../example_data/output'+basename[basename.rfind('/'):]+'_treeheights.txt' 
-    fn_peaks    = '../example_data/output'+basename[basename.rfind('/'):]+'_localpeaks.txt' 
-    fn_shape    = '../example_data/output'+basename[basename.rfind('/'):]+'_treecrowns.shp' 
+    fn_tree     = basename+'_treecrowns.tif' 
+    fn_gaps     = basename+'_forestgaps.tif' 
+    fn_heights  = basename+'_treeheights.txt' 
+    fn_peaks    = basename+'_localpeaks.txt' 
+    fn_shape    = basename+'_treecrowns.shp' 
     # read point cloud
     x,y,z,c = getpoints(In)
     
@@ -143,11 +143,14 @@ if __name__=='__main__':
     
     peak = 0
     
-    print 'Extract tree crowns ...',
+    print 'Extract tree crowns ...'
     time.sleep(0.1)
     t0 = time.time()
-        
+    threshold = 1.5
+    
+    step = 0    
     for seed in coos:
+        step = ETA(t0,time.time(),step,peak,0,len(coos))
         top = (peak_x[peak], peak_y[peak], peak_z[peak])
         # s_max is based on regression line with field data of Hunter et al.
         s_max = (0.36757982565888242*top[2]+-0.87528173222693795)/2+0.5
@@ -155,9 +158,10 @@ if __name__=='__main__':
         label = peak+1
         while len(seeds) > 0:  
             seed = seeds[0]
-            crowns, seeds = treecrowns(chm, seed, crowns, seeds, old_seeds, label, top, s_max, Xi, Yi)
+            crowns, seeds = treecrowns(chm, seed, crowns, seeds, old_seeds, label, top, s_max, Xi, Yi, threshold)
         # next tree crown
-        peak+=1    
+        peak+=1
+        
     nodata = -999
     crowns[np.isnan(crowns)==1] = nodata    
 
@@ -195,30 +199,28 @@ if __name__=='__main__':
     saveimg(np.flipud(crowns==-999), fn_gaps, len(xi), len(yi), geotransform, proj)
     # polygonize tree crowns
     polygonize(fn_tree, fn_shape)
-    sys.exit()
     
     # plot
     import pylab as plt
     fig = plt.figure(figsize=(15,5))
     ax = fig.add_subplot(131)
     plt.imshow(chm, extent=[Xi.min(), Xi.max(), Yi.min(), Yi.max()])
-    plt.scatter(tree_x, tree_y, c = 'k', marker='+', s=100)
+    plt.scatter(peak_x, peak_y, c = 'k', marker='+', s=100)
     plt.xlim([Xi.min(),Xi.max()])
     plt.ylim([Yi.min(),Yi.max()])
     title = 'local peaks (n=%d)' % (peak)
     plt.title(title)
     
+    crowns[crowns==nodata] = np.NaN
     ax = fig.add_subplot(132)
-    plt.imshow(crowns, extent=[Xi.min(), Xi.max(), Yi.min(), Yi.max()], cmap='prism')
-    #plt.scatter(tree_x, tree_y, c = 'k', marker='+', s=100)
+    plt.imshow(crowns, extent=[Xi.min(), Xi.max(), Yi.min(), Yi.max()], cmap='flag')
     plt.xlim([Xi.min(),Xi.max()])
     plt.ylim([Yi.min(),Yi.max()])
-    
-    title = 'tree crowns (n=%d)' % len(np.unique(crowns))
+    title = 'tree crowns (n=%d)' % len(np.unique(crowns[np.isnan(crowns)==False]))
     plt.title(title)
     
     ax = fig.add_subplot(133)
-    plt.imshow(crowns==-999, extent=[Xi.min(), Xi.max(), Yi.min(), Yi.max()])
+    plt.imshow(np.isnan(crowns), extent=[Xi.min(), Xi.max(), Yi.min(), Yi.max()])
     #plt.scatter(tree_x, tree_y, c = 'k', marker='+', s=100)
     plt.xlim([Xi.min(),Xi.max()])
     plt.ylim([Yi.min(),Yi.max()])

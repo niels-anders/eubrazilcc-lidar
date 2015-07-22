@@ -33,7 +33,7 @@ if __name__=='__main__':
     extension = os.path.splitext(filename)[1]
 
     In  = filename
-    fn  = '../example_data/output'+basename[basename.rfind('/'):]+'_chm.tif' 
+    fn  = basename+'_chm.tif' 
     # read point cloud
     x,y,z,c = getpoints(In)
     
