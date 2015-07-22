@@ -146,14 +146,14 @@ if __name__=='__main__':
     print 'Extract tree crowns ...'
     time.sleep(0.1)
     t0 = time.time()
-    threshold = 1.5
+    threshold = 2.5
     
     step = 0    
     for seed in coos:
         step = ETA(t0,time.time(),step,peak,0,len(coos))
         top = (peak_x[peak], peak_y[peak], peak_z[peak])
         # s_max is based on regression line with field data of Hunter et al.
-        s_max = (0.36757982565888242*top[2]+-0.87528173222693795)/2+0.5
+        s_max = ((0.36757982565888242*top[2]+-0.87528173222693795)/2)*1.5
         seeds = np.array([seed])
         label = peak+1
         while len(seeds) > 0:  
