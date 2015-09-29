@@ -7,7 +7,8 @@ import numpy as np
 import sys, os.path, time
 
 def createRH(x,y,z,rh,dtm,bx,by,pc):
-    print 'Calculate RH%2d (%d x %d)...' % (pc, len(xi), len(yi)),
+    ny, nx = rh.shape
+    print 'Calculate RH%2d (%d x %d)...' % (pc, nx, ny),
     time.sleep(0.1)
     t0 = time.time()
     for i in np.arange(len(bx)-1):

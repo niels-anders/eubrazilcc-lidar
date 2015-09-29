@@ -8,7 +8,6 @@ import subprocess
 
 def worker(py, fn):
     try:
-        print py, fn
         job = subprocess.Popen(['python', py, fn])     
         job.wait()
     except OSError as e:
@@ -34,11 +33,11 @@ if __name__ == '__main__':
     usage: $ python batching.py <script.py> <folder location>
     example: $ python batching.py dtm.py ../example_data/laz/ (! note the final slash)
     """    
-    #py = 'dtm.py'
-    #path = '../../example_data/laz/'
+    py = 'biomass.py'
+    path = '../../example_data/laz/'
     
-    py = sys.argv[1]
-    path = sys.argv[2]
+    #py = sys.argv[1]
+    #path = sys.argv[2]
     
     filelist = os.listdir(path) 
     fn =  []

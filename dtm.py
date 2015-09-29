@@ -59,7 +59,7 @@ if __name__=='__main__':
     
     # georeferencing info
     geotransform = (x.min(), res, 0, y.max(), 0, -res)  # used for georeference metadata in geotiff
-    proj = 'PROJCS["SIRGAS 2000 / UTM zone 20S",GEOGCS["SIRGAS 2000",DATUM["Sistema_de_Referencia_Geocentrico_para_America_del_Sur_2000",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6674"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4674"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-63],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",10000000],AUTHORITY["EPSG","31980"],AXIS["Easting",EAST],AXIS["Northing",NORTH]]' # mandatory setting used to store projection information in metadata geotiff (not assigned as metadata is not stored in lidar txt)
+    proj = '+proj=utm +zone=21 +south +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs' # mandatory setting used to store projection information in metadata geotiff (not assigned as metadata is not stored in lidar file)
     
     # create DTM
     dtm = createDTM(x[g],y[g],z[g],xi,yi,res,geotransform, proj, method='idw')

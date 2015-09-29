@@ -7,7 +7,8 @@ import numpy as np
 import sys, os.path, time
 
 def Cover(x,y,c,cover,bx,by):
-    print 'Calculate forest cover (%d x %d)...' % (len(xi), len(yi)),
+    ny,nx = cover.shape
+    print 'Calculate forest cover (%d x %d)...' % (nx, ny),
     time.sleep(0.1)
     t0 = time.time()
     gp = c == 2
@@ -57,7 +58,7 @@ if __name__=='__main__':
     geotransform = (x.min(), res, 0, y.max(), 0, -res)  # used for georeference metadata in geotiff
     proj = '' # mandatory setting used to store projection information in metadata geotiff (not assigned as metadata is not stored in lidar txt)
     
-    # Calculate point density
+    # Calculate cover density
     cover = Cover(x,y,c,grid,bx,by)
     
     # write tiff

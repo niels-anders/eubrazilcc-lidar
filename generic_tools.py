@@ -60,6 +60,25 @@ def saveimg(Array, filename, cols, rows, geotransform, proj, printYN = 'yes'):
     outData = None
     if printYN == 'yes': print 'File saved as '+filename
 
+def openimg(filename):
+    inData = gdal.Open(filename, 0)
+    #driver = gdal.GetDriverByName('HFA')
+    if inData is None:
+        print 'Could not open ' + filename
+
+    # get metadata
+    cols = inData.RasterXSize
+    rows = inData.RasterYSize
+    # geotransform = (left, cellsize, 0.0, top, 0.0, -cellsize)
+    geotransform = inData.GetGeoTransform()
+    proj = inData.GetProjection()
+    res = geotransform[1]
+    # get band
+    band = inData.GetRasterBand(1)
+    # get data as array
+    data = band.ReadAsArray(0,0, cols, rows)
+    return data, cols, rows, res, geotransform, proj
+    
 def idw(x,y,z,xi,yi, nnear=501):
     import invdisttree
     xy = np.append([x],[y],axis=0).transpose() 
