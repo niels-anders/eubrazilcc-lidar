@@ -11,21 +11,21 @@ def createDSM(x,y,z,xi,yi,bx,by,res,geotransform, proj):
     Create DSM based on max point elevation
     """
     from generic_tools import idw
-    print 'Create DSM (%d x %d)...' % (len(xi), len(yi))
-    time.sleep(0.1)
-    t0 = time.time()
+    #print 'Create DSM (%d x %d)...' % (len(xi), len(yi))
+    #time.sleep(0.1)
+    #t0 = time.time()
     
     # initialize dsm array
     dsm = np.zeros((len(yi), len(xi))) * np.NaN
     
-    step = 0
+    #step = 0
     for i in np.arange(len(xi)):
         col = np.argwhere((x > bx[i]) & (x < bx[i+1]))
         for j in np.arange(len(yi)):
             row = (y[col] >= by[j]) & (y[col] < by[j+1])
             if sum(row) > 0:           
                 dsm[j,i] = z[col[row]].max()
-        step = ETA(t0,time.time(),0.01,step,i,0,len(xi))                
+        #step = ETA(t0,time.time(),0.01,step,i,0,len(xi))                
             
     # fill gaps using IDW interpolation ---------------------------
     XI, YI = np.meshgrid(xi,yi, indexing='xy')
@@ -34,9 +34,9 @@ def createDSM(x,y,z,xi,yi,bx,by,res,geotransform, proj):
     dsm[nodata] = idw(XI[values], YI[values], dsm[values], XI[nodata], YI[nodata], 25)
          
     # return
-    t1 = time.time()
-    print ' --> finished in %1d seconds' % (t1-t0)
-    time.sleep(0.1)
+    #t1 = time.time()
+    #print ' --> finished in %1d seconds' % (t1-t0)
+    #time.sleep(0.1)
     
     return dsm    
     

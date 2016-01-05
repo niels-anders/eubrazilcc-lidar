@@ -18,7 +18,7 @@ def callback(fn):
     print fn, 'done'
     
 def apply_async_with_callback(py, filelist):
-    cpu = mp.cpu_count()-2
+    cpu = mp.cpu_count()-1
     
     print '# cpus: %d' % cpu       
     pool = mp.Pool(processes = cpu)
@@ -33,11 +33,11 @@ if __name__ == '__main__':
     usage: $ python batching.py <script.py> <folder location>
     example: $ python batching.py dtm.py ../example_data/laz/ (! note the final slash)
     """    
-    py = 'chm.py'
-    path = '../../LiDAR/laz/'
+    #py = 'chm.py'
+    #path = '../../LiDAR/laz/'
     
-    #py = sys.argv[1]
-    #path = sys.argv[2]
+    py = sys.argv[1]
+    path = sys.argv[2]
     
     filelist = os.listdir(path) 
     fn =  []

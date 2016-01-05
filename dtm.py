@@ -6,11 +6,12 @@ from generic_tools import saveimg, getpoints, gridcellborders
 import numpy as np
 import sys, time, os.path
 
-def createDTM(x, y, z, xi, yi, res, geotransform, proj, method='idw'):    
-    print 'Create DTM (%d x %d)...' % (len(xi), len(yi)),
-    time.sleep(0.1)
-    t0 = time.time()
-    
+def createDTM(x, y, z, xi, yi, res, geotransform, proj, method='idw', printYN='no'):    
+    if printYN=='yes':    
+        print 'Create DTM (%d x %d)...' % (len(xi), len(yi)),
+        time.sleep(0.1)
+        t0 = time.time()
+        
     XI, YI = np.meshgrid(xi, yi, indexing='xy')
 
     nnear = 25
@@ -24,9 +25,10 @@ def createDTM(x, y, z, xi, yi, res, geotransform, proj, method='idw'):
     dtm[dtm==-999] = np.NaN
 
     # return
-    t1 = time.time()
-    print 'finished in %2d seconds' % (t1-t0)
-    time.sleep(0.1)
+    if printYN=='yes':    
+        t1 = time.time()
+        print 'finished in %2d seconds' % (t1-t0)
+        time.sleep(0.1)
     return dtm  
     
 if __name__=='__main__':
@@ -64,11 +66,8 @@ if __name__=='__main__':
     # create DTM
     dtm = createDTM(x[g],y[g],z[g],xi,yi,res,geotransform, proj, method='idw')
     
-    stats = dtm[np.isnan(dtm)==0]
-    print 'min: %.2f | max: %.2f | mean: %.2f | stdev: %.2f' % (stats.min(), stats.max(), np.mean(stats), np.std(stats))
+    #stats = dtm[np.isnan(dtm)==0]
+    #print 'min: %.2f | max: %.2f | mean: %.2f | stdev: %.2f' % (stats.min(), stats.max(), np.mean(stats), np.std(stats))
 
     # write tiff
     saveimg(np.flipud(dtm), fn, len(xi), len(yi), geotransform, proj)
-    #string = str('gdal_translate '+ fn+' D:/testdtm.png -of PNG -scale') 
-    #print string    
-    #exec(string)

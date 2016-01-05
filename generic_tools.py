@@ -35,7 +35,7 @@ def gridcellborders(xi,yi,res):
     by = np.arange(yi.min() - res/float(2), yi.max() + res, res)
     return bx, by
     
-def saveimg(Array, filename, cols, rows, geotransform, proj, printYN = 'yes'):
+def saveimg(Array, filename, cols, rows, geotransform, proj, printYN = 'no'):
     # change NaN to -999 nodata value
     Array[np.isnan(Array)] = -999
     # get driver
@@ -61,7 +61,6 @@ def saveimg(Array, filename, cols, rows, geotransform, proj, printYN = 'yes'):
 
 def openimg(filename):
     inData = gdal.Open(filename, 0)
-    #driver = gdal.GetDriverByName('HFA')
     if inData is None:
         print 'Could not open ' + filename
 
@@ -88,10 +87,11 @@ def idw(x,y,z,xi,yi, nnear=501):
     #zi = zi.reshape(xi.shape)
     return zi
     
-def getpoints(In):
-    print 'get points....',
-    time.sleep(0.1)
-    t0 = time.time()
+def getpoints(In, printYN='no'):
+    if printYN=='yes':
+        print 'get points....',
+        time.sleep(0.1)
+        t0 = time.time()
 
     if (In[-3:] == 'laz') or (In[-3:] == 'las'):
         import liblas
@@ -115,7 +115,8 @@ def getpoints(In):
         lines = f.readlines()
         data = np.zeros((len(lines),6))
         i = 0
-        t0 = time.time()
+        if printYN=='yes':
+            t0 = time.time()
         for line in lines:
             line = np.array(filter(None, line.split(' ')))
             data[i] = line.astype('float64')      
@@ -123,7 +124,8 @@ def getpoints(In):
         x,y,z,c = data[:,0], data[:,1], data[:,2], data[:,5]   
     
     # return
-    t1 = time.time()
-    print 'finished in %2d seconds' % (np.round(t1-t0))
-    time.sleep(0.1)  
+    if printYN=='yes':
+        t1 = time.time()
+        print 'finished in %2d seconds' % (np.round(t1-t0))
+        time.sleep(0.1)  
     return x,y,z,c
