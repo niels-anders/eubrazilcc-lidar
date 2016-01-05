@@ -25,7 +25,7 @@ def createDSM(x,y,z,xi,yi,bx,by,res,geotransform, proj):
             row = (y[col] >= by[j]) & (y[col] < by[j+1])
             if sum(row) > 0:           
                 dsm[j,i] = z[col[row]].max()
-        step = ETA(t0,time.time(),step,i,0,len(xi))                
+        step = ETA(t0,time.time(),0.01,step,i,0,len(xi))                
             
     # fill gaps using IDW interpolation ---------------------------
     XI, YI = np.meshgrid(xi,yi, indexing='xy')
@@ -35,7 +35,7 @@ def createDSM(x,y,z,xi,yi,bx,by,res,geotransform, proj):
          
     # return
     t1 = time.time()
-    print 'finished in %1d seconds' % (t1-t0)
+    print ' --> finished in %1d seconds' % (t1-t0)
     time.sleep(0.1)
     
     return dsm    

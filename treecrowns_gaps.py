@@ -2,7 +2,7 @@
 """
 (C) 2015, Niels Anders, EUBrazilCC
 """
-from generic_tools import getpoints, gridcellborders, saveimg, ETA
+from generic_tools import getpoints, gridcellborders, saveimg, ETA, openimg
 import numpy as np
 import sys, os.path, time
 import os
@@ -75,6 +75,20 @@ def treecrowns(chm, seed, crowns, seeds, old_seeds, label, top, s_max, xi, yi, t
         seeds = seeds[1:,:]
     return crowns, seeds
 
+def crownheights(chm, crowns):
+    """nog niet klaar"""
+    chmf = chm.flatten()
+    crownsf = crowns.flatten()    
+    
+    ids = np.unique(crownsf)
+    ids = ids[np.isnan(ids)==0]
+    ch = np.zeros(crownsf.shape)* np.nan
+    for i in ids:
+        n = np.argwhere(crowns==i)
+        ch[n] = chmf[n].max()
+    ch = ch.reshape(crowns.shape)
+    return ch
+        
     
 if __name__=='__main__':    
     
@@ -112,20 +126,29 @@ if __name__=='__main__':
     proj = '' # mandatory setting used to store projection information in metadata geotiff (not assigned as metadata is not stored in lidar txt)
     
     # create dtm
-    from dtm import createDTM  
-    g = c == 2
-    dtm = createDTM(x[g],y[g],z[g],xi,yi,res,geotransform, proj, method='idw')    
+    try:
+        dtm, _, _, _, _, _ = openimg(basename+'_dtm.tif')
+    except:        
+        from dtm import createDTM  
+        g = c == 2
+        dtm = createDTM(x[g],y[g],z[g],xi,yi,res,geotransform, proj, method='idw')    
     
     # create dsm
-    from dsm import createDSM
-    dsm = createDSM(x,y,z,xi,yi,bx,by,res,geotransform, proj)
+    try:
+        dtm, _, _, _, _, _ = openimg(basename+'_dsm.tif')
+    except:        
+        from dsm import createDSM
+        dsm = createDSM(x,y,z,xi,yi,bx,by,res,geotransform, proj)
     
     # create chm
-    from chm import createCHM
-    chm = createCHM(dtm,dsm)
-    
+    try:
+        chm, _, _, _, _, _ = openimg(basename+'_chm.tif')
+    except:            
+        from chm import createCHM
+        chm = createCHM(dtm,dsm)
+        
     # create tree crowns map
-    localmax = ndlocalmaxima(chm,s=1)   # get local maxima
+    localmax = ndlocalmaxima(chm,s=2)   # get local maxima
     coos = np.argwhere(localmax == 1)
     
     Xi, Yi = np.meshgrid(xi, yi)
@@ -150,7 +173,7 @@ if __name__=='__main__':
     
     step = 0    
     for seed in coos:
-        step = ETA(t0,time.time(),step,peak,0,len(coos))
+        step = ETA(t0,time.time(),0.01,step,peak,0,len(coos))
         top = (peak_x[peak], peak_y[peak], peak_z[peak])
         # s_max is based on regression line with field data of Hunter et al.
         s_max = ((0.36757982565888242*top[2]+-0.87528173222693795)/2)*1.5
@@ -166,7 +189,7 @@ if __name__=='__main__':
     crowns[np.isnan(crowns)==1] = nodata    
 
     t1 = time.time()
-    print 'finished in %2d seconds' % (t1-t0)
+    print ' --> finished in %2d seconds' % (t1-t0)
     time.sleep(0.1)    
 
     # peaks

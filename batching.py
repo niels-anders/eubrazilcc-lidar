@@ -33,8 +33,8 @@ if __name__ == '__main__':
     usage: $ python batching.py <script.py> <folder location>
     example: $ python batching.py dtm.py ../example_data/laz/ (! note the final slash)
     """    
-    py = 'biomass.py'
-    path = '../../example_data/laz/'
+    py = 'chm.py'
+    path = '../../LiDAR/laz/'
     
     #py = sys.argv[1]
     #path = sys.argv[2]

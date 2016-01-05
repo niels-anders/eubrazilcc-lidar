@@ -4,31 +4,30 @@ Generic tools for lidar processing
 
 (c) 2015 EUBrazilCC, Niels Anders
 """
-import time
+import time, sys
 import numpy as np
 from osgeo import gdal
 
-def ETA(t0,t1, step, i, r, k):
+def ETA(t0,t1, s, step, i, r, k):
     """
-    t0 = start time
-    t1 = current time
-    step = interval print to screen (fraction)
-    i = current row
-    r = correction of row number (required boundaries of dem are not taken into account)
-    k = total number of rows to process    
+    t0: start start
+    t1: current time
+    s: step size to print to screen
+    step: current step
+    i: current row
+    r: start row (mostly 0)
+    k: total number of rows    
     """
-    if i==0:
-        print '0 - - - - - - - - - - 100%'
-        print ' ',
     pc = float(i+1- r)/k
-    
-    if pc == 1:
-        print ''
-    elif pc >= step:
-        print '#',
-        step = step+0.1
-
-    return step
+    if pc >= s:
+        t1 = time.time()
+        time_running = t1-t0
+        time_left = time_running/pc-time_running
+        ETA = t1+time_left
+        sys.stdout.write( '\r%3.1f' % (pc*100) +' % completed --> ETA: '+ time.strftime('%d %b %Y %H:%M:%S',time.localtime(ETA)))
+        sys.stdout.flush()
+        s = s+ step
+    return s
 
 def gridcellborders(xi,yi,res):
     # grid cell borders

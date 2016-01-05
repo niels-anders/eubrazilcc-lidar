@@ -3,12 +3,13 @@ from generic_tools import getpoints, gridcellborders, saveimg
 import numpy as np
 import sys, os.path, time
 
-def calcAGB(Cover,RH50):
-    ny, nx = Cover.shape
+def calcAGB(RH50):#Cover,RH50):
+    ny, nx = RH50.shape
     print 'Calculate AGB (%d x %d)...' % (nx, ny),
     time.sleep(0.1)
     t0 = time.time()
-    agb = (-38.5151+18.6238*Cover*RH50)/10000 # 10^3 kg m^-2
+    #agb = (-38.5151+18.6238*Cover*RH50)/10000 # 10^3 kg m^-2
+    agb = 3.58+0.07*RH50 # [Mg/ha], Drake et al. 2002
 
     # return
     t1 = time.time()
@@ -53,16 +54,24 @@ if __name__=='__main__':
     dtm = createDTM(x[g],y[g],z[g],xi,yi,res,geotransform, proj, method='idw')    
     
     # Calculate cover
-    from cover import Cover
-    cover = Cover(x,y,c,grid,bx,by)
+    #from cover import Cover
+    #cover = Cover(x,y,c,grid,bx,by)
         
     # Calculate RH50
     from relativeheight import createRH
     rh50 = createRH(x,y,z,grid,dtm,bx,by,50)
     
     # Calculate biomass
-    agb = calcAGB(cover,rh50)
-    
+    #agb = calcAGB(cover,rh50)
+    agb = calcAGB(rh50)
+
     # write tiff
     saveimg(np.flipud(agb), fn, len(xi), len(yi), geotransform, proj)
+    
+    # write intermediate results
+    fn  = basename+'_dtm.tif'
+    saveimg(np.flipud(dtm), fn, len(xi), len(yi), geotransform, proj)
+    fn  = basename+'_rh50.tif'    
+    saveimg(np.flipud(rh50), fn, len(xi), len(yi), geotransform, proj)    
+
     

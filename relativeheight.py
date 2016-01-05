@@ -2,7 +2,7 @@
 """
 (C) 2015, Niels Anders, EUBrazilCC
 """
-from generic_tools import getpoints, gridcellborders, saveimg
+from generic_tools import getpoints, gridcellborders, saveimg, ETA
 import numpy as np
 import sys, os.path, time
 
@@ -11,12 +11,15 @@ def createRH(x,y,z,rh,dtm,bx,by,pc):
     print 'Calculate RH%2d (%d x %d)...' % (pc, nx, ny),
     time.sleep(0.1)
     t0 = time.time()
+    step=0
     for i in np.arange(len(bx)-1):
         col = np.argwhere((x > bx[i]) & (x < bx[i+1]))
         for j in np.arange(len(by)-1):
             row = (y[col] >= by[j]) & (y[col] < by[j+1])
             if sum(row) > 0:           
                 rh[j,i] = np.percentile(z[col[row]] - dtm[j,i], pc)
+        step = ETA(t0,time.time(), step, 0.001, i,0,nx)
+    
     # return
     t1 = time.time()
     print 'finished in %1d seconds' % (t1-t0)

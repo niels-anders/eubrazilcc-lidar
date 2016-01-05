@@ -65,3 +65,6 @@ if __name__=='__main__':
     # write tiff
     saveimg(np.flipud(chm), fn, len(xi), len(yi), geotransform, proj)
     
+    saveimg(np.flipud(dtm), basename+'_dtm.tif' , len(xi), len(yi), geotransform, proj)
+    saveimg(np.flipud(dsm), basename+'_dsm.tif' , len(xi), len(yi), geotransform, proj)
+    
